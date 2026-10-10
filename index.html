@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mommy Tattoo & Piercing | Nowy Sącz • Studio Tatuażu</title>
+    <meta name="description" content="Mommy Tattoo Nowy Sącz - profesjonalne studio tatuażu i piercingu. Ul. 29 Listopada 8. Fineline, delikatne linie, kolor, autorskie projekty. Zarezerwuj termin online 24/7.">
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Flag Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css">
+
+    <!-- Konfiguracja Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            rose: '#e11d48',
+                            roseLight: '#fb7185',
+                            roseDark: '#be123c',
+                            dark: '#09090b',
+                            card: '#121216',
+                            border: 'rgba(255, 255, 255, 0.08)'
+                        }
+                    },
+                    fontFamily: {
+                        script: ['"Marck Script"', 'cursive'],
+                        calligraphy: ['"Alex Brush"', 'cursive'],
+                        hand: ['"Caveat"', 'cursive'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#09090b] text-neutral-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-rose-600 selection:text-white">
+
+    <!-- SUBTELNA CZERWONA MGŁA W TLE (Ambient Canvas) -->
+    <canvas id="ambient-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- GÓRNY PASEK DEMONSTRACYJNY (DEMO BAR) -->
+    <div class="bg-neutral-950 text-white py-2.5 px-4 sm:px-6 text-center text-xs sm:text-sm font-medium border-b border-white/10 relative z-50 shadow-md flex items-center justify-center gap-3 flex-wrap">
+        <span class="inline-flex items-center gap-1.5 bg-rose-500/20 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider text-rose-400 border border-rose-400/30">
+            <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> Wersja Demo
+        </span>
+        <span class="text-neutral-300">Spersonalizowany projekt strony przygotowany dla <strong>Mommy Tattoo</strong> w Nowym Sączu.</span>
+        <button type="button" onclick="openContactOwnerModal()" class="underline text-rose-400 hover:text-white font-bold transition cursor-pointer">
+            Chcesz taką stronę? Skontaktuj się ze mną! →
+        </button>
+        <span class="hidden md:inline text-neutral-600">|</span>
+        <a href="#admin" onclick="navigateToAdmin()" class="hidden md:inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-rose-400 font-bold font-mono transition">
+            <i class="fa-solid fa-lock text-[10px]"></i> Panel Studia
+        </a>
+    </div>
+
+    <!-- UNIWERSALNY MODAL POWIADOMIEŃ (Custom Alert & Confirm) -->
+    <div id="custom-modal-backdrop" class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4 transition-all duration-300 opacity-0">
+        <div id="custom-modal-card" class="bg-[#121216] border border-white/15 p-6 sm:p-8 rounded-3xl max-w-md w-full text-center shadow-2xl relative transform transition-all duration-300 scale-95 opacity-0 overflow-hidden">
+            <button id="custom-modal-close-btn" type="button" aria-label="Zamknij" onclick="closeCustomModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-white flex items-center justify-center text-sm transition cursor-pointer border border-white/10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="custom-modal-icon-container" class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-md"></div>
+            <h3 id="custom-modal-title" class="text-xl sm:text-2xl text-white mb-3 font-bold leading-tight px-2"></h3>
+            <div id="custom-modal-body" class="text-xs sm:text-sm text-neutral-300 leading-relaxed mb-6 font-normal"></div>
+            <div id="custom-modal-actions" class="flex flex-col-reverse sm:flex-row gap-3 justify-center">
+                <button id="custom-modal-cancel-btn" type="button" class="hidden w-full sm:w-auto px-6 py-2.5 rounded-xl border border-white/20 text-neutral-300 hover:bg-neutral-800 text-xs uppercase tracking-wider transition cursor-pointer font-bold">Anuluj</button>
+                <button id="custom-modal-confirm-btn" type="button" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-7 py-2.5 rounded-xl text-xs uppercase tracking-wider transition cursor-pointer shadow-md w-full sm:w-auto">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KONTAKTU W SPRAWIE STRONY -->
+    <div id="contact-owner-modal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div class="bg-[#121216] border border-white/15 p-6 sm:p-10 rounded-3xl max-w-lg w-full relative shadow-2xl text-white">
+            <button onclick="closeContactOwnerModal()" type="button" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-white flex items-center justify-center text-sm border border-white/10 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl mx-auto mb-3 border border-rose-500/30">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <h3 class="text-xl sm:text-2xl font-bold">Skontaktuj Się w Sprawie Strony</h3>
+                <p class="text-xs sm:text-sm text-neutral-400 mt-1">Chcesz wdrożyć ten projekt i zautomatyzować zapisy w Mommy Tattoo?</p>
+            </div>
+            <div class="space-y-3.5 bg-neutral-900/80 p-5 rounded-2xl border border-white/10 text-xs sm:text-sm">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-envelope text-rose-400 w-5"></i>
+                    <span class="break-all font-mono">kacperekwas1@gmail.com</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-clock text-rose-400 w-5"></i>
+                    <span>Szybki czas wdrożenia i pełna personalizacja</span>
+                </div>
+            </div>
+            <div class="mt-6 text-center">
+                <a href="mailto:kacperekwas1@gmail.com?subject=Wdrożenie%20strony%20Mommy%20Tattoo" class="inline-block w-full py-3.5 px-6 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg">
+                    Napisz Wiadomość E-mail
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAWIGACJA GŁÓWNA (STICKY NAVBAR) -->
+    <nav class="sticky top-0 left-0 w-full z-40 bg-[#09090b]/90 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-[1500px] mx-auto px-4 sm:px-8 lg:px-12">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo studia -->
+                <a href="#" class="flex items-center gap-3 group flex-shrink-0">
+                    <div class="w-12 h-12 rounded-2xl bg-neutral-900/90 border border-white/10 p-1 flex items-center justify-center overflow-hidden group-hover:border-rose-500/50 transition">
+                        <img src="logo.png" alt="Mommy Tattoo" class="w-full h-full object-contain">
+                    </div>
+                    <div>
+                        <span class="font-script text-2xl sm:text-3xl text-white block leading-none tracking-wide group-hover:text-rose-400 transition">Mommy Tattoo</span>
+                        <span class="text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-neutral-400 block font-semibold mt-0.5">Nowy Sącz • 29 Listopada 8</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Menu: równe odstępy, nie nachodzą na siebie -->
+                <div class="hidden lg:flex items-center gap-6 xl:gap-8 text-xs sm:text-sm font-semibold tracking-wider text-neutral-300">
+                    <a href="#about" class="hover:text-white transition whitespace-nowrap">O Studiu</a>
+                    <a href="#benefits" class="hover:text-white transition whitespace-nowrap">Dlaczego Strona?</a>
+                    <a href="#portfolio" class="hover:text-white transition whitespace-nowrap">Portfolio</a>
+                    <a href="#rezerwacja" class="hover:text-rose-400 transition whitespace-nowrap">Rezerwacja</a>
+                    <a href="#testimonials" class="hover:text-white transition whitespace-nowrap">Opinie (5.0★)</a>
+                    <a href="#contact" class="hover:text-white transition whitespace-nowrap">Kontakt</a>
+                </div>
+
+                <!-- CTA Przycisk & Hamburger Mobile -->
+                <div class="flex items-center gap-3 flex-shrink-0">
+                    <a href="https://www.instagram.com/mommytattoo.studio/" target="_blank" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-300 hover:text-white hover:bg-neutral-900 border border-white/10 transition">
+                        <i class="fa-brands fa-instagram text-rose-500"></i>
+                        <span>Instagram</span>
+                    </a>
+                    <a href="#rezerwacja" class="bg-rose-600 hover:bg-rose-700 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-white font-bold text-xs uppercase tracking-wider transition shadow-md hover:shadow-rose-900/40 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>Zarezerwuj</span>
+                    </a>
+                    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="lg:hidden w-10 h-10 rounded-xl border border-white/10 bg-neutral-900 flex items-center justify-center text-white hover:bg-neutral-800 transition cursor-pointer" aria-label="Menu mobilne">
+                        <i class="fa-solid fa-bars text-base" id="mobile-menu-icon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Menu Mobile Drawer -->
+            <div id="mobile-menu" class="hidden lg:hidden bg-[#0c0c10]/98 backdrop-blur-md border-t border-white/10 py-5 px-4 space-y-3 shadow-2xl">
+                <a href="#about" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-neutral-300 hover:text-rose-400 py-1.5 border-b border-white/5">O Studiu</a>
+                <a href="#benefits" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-neutral-300 hover:text-rose-400 py-1.5 border-b border-white/5">Dlaczego Strona?</a>
+                <a href="#portfolio" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-neutral-300 hover:text-rose-400 py-1.5 border-b border-white/5">Portfolio Prac</a>
+                <a href="#rezerwacja" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-rose-400 hover:text-rose-300 py-1.5 border-b border-white/5">Zarezerwuj Wizytę</a>
+                <a href="#testimonials" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-neutral-300 hover:text-rose-400 py-1.5 border-b border-white/5">Opinie Klientów (5.0★)</a>
+                <a href="#contact" onclick="toggleMobileMenu()" class="block text-sm font-semibold text-neutral-300 hover:text-rose-400 py-1.5">Kontakt & Adres</a>
+                <div class="pt-2 border-t border-white/10">
+                    <a href="https://www.instagram.com/mommytattoo.studio/" target="_blank" class="inline-flex items-center gap-2 text-xs font-semibold text-rose-400 py-1">
+                        <i class="fa-brands fa-instagram"></i> @mommytattoo.studio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- GŁÓWNY WIDOK STRONY -->
+    <div id="main-content-view" class="flex-grow flex flex-col justify-between relative z-10">
+
+        <!-- SEKCJA: HERO -->
+        <header class="relative min-h-[75vh] sm:min-h-[78vh] flex items-center justify-center pt-12 sm:pt-16 pb-16 sm:pb-20 overflow-hidden border-b border-white/10">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[650px] h-[400px] sm:h-[650px] bg-rose-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+            <div class="max-w-[1300px] mx-auto px-4 sm:px-8 text-center relative z-10">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/90 border border-white/10 text-neutral-300 text-xs uppercase tracking-wider font-semibold mb-6 shadow-xs reveal-on-scroll">
+                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                    <span>Studio Tatuażu & Piercingu • Nowy Sącz</span>
+                </div>
+
+                <!-- Tytuł z kaligraficznym nagłówkiem -->
+                <h1 class="reveal-on-scroll mb-4">
+                    <span class="font-script text-5xl sm:text-7xl md:text-8xl text-white block tracking-wide text-glow">Mommy Tattoo</span>
+                    <span class="text-base sm:text-xl md:text-2xl font-light text-neutral-300 tracking-wider uppercase block mt-2">
+                        Sztuka Tatuażu & Profesjonalny Piercing
+                    </span>
+                </h1>
+
+                <p class="text-neutral-400 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-8 reveal-on-scroll">
+                    Miejsce, w którym profesjonalizm spotyka się z domową atmosferą. Delikatny fineline, barwne projekty autorskie oraz bezpieczny piercing w Nowym Sączu.
+                </p>
+
+                <!-- Przyciski CTA -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14 reveal-on-scroll">
+                    <a href="#rezerwacja" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition shadow-lg shadow-rose-900/30 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calendar-days"></i> Zarezerwuj Termin Online
+                    </a>
+                    <a href="#portfolio" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 text-neutral-200 border border-white/10 font-bold text-xs sm:text-sm uppercase tracking-wider transition flex items-center justify-center gap-2">
+                        <span>Zobacz Prace</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- 4 KAFELKI ZAUFANIA (Responsywne i zabezpieczone przed ucinaniem) -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto text-left reveal-on-scroll">
+                    <div class="p-4 sm:p-5 rounded-2xl luxury-card overflow-hidden">
+                        <div class="flex items-center gap-2 text-rose-400 mb-1">
+                            <i class="fa-solid fa-star text-xs"></i>
+                            <span class="font-bold text-xs uppercase tracking-wider text-neutral-400">Ocena Google</span>
+                        </div>
+                        <span class="font-bold text-lg sm:text-2xl text-white block">5.0 ★</span>
+                        <span class="text-[11px] text-neutral-400">74 autentyczne opinie</span>
+                    </div>
+
+                    <div class="p-4 sm:p-5 rounded-2xl luxury-card overflow-hidden">
+                        <div class="flex items-center gap-2 text-rose-400 mb-1">
+                            <i class="fa-solid fa-location-dot text-xs"></i>
+                            <span class="font-bold text-xs uppercase tracking-wider text-neutral-400">Lokalizacja</span>
+                        </div>
+                        <span class="font-bold text-sm sm:text-base text-white block truncate">ul. 29 Listopada 8</span>
+                        <span class="text-[11px] text-neutral-400">Nowy Sącz</span>
+                    </div>
+
+                    <div class="p-4 sm:p-5 rounded-2xl luxury-card overflow-hidden">
+                        <div class="flex items-center gap-2 text-rose-400 mb-1">
+                            <i class="fa-solid fa-gem text-xs"></i>
+                            <span class="font-bold text-xs uppercase tracking-wider text-neutral-400">Oferta</span>
+                        </div>
+                        <span class="font-bold text-sm sm:text-base text-white block">Tatuaż & Piercing</span>
+                        <span class="text-[11px] text-neutral-400">Fineline, kolor, sterylność</span>
+                    </div>
+
+                    <div class="p-4 sm:p-5 rounded-2xl luxury-card overflow-hidden">
+                        <div class="flex items-center gap-2 text-rose-400 mb-1">
+                            <i class="fa-solid fa-clock text-xs"></i>
+                            <span class="font-bold text-xs uppercase tracking-wider text-neutral-400">Rezerwacja</span>
+                        </div>
+                        <span class="font-bold text-lg sm:text-2xl text-white block">24 / 7</span>
+                        <span class="text-[11px] text-neutral-400">Zapisy online w 3 min</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SEKCJA: O STUDIU -->
+        <section id="about" class="py-16 sm:py-24 border-b border-white/10 bg-neutral-950/40">
+            <div class="max-w-[1300px] mx-auto px-4 sm:px-8 lg:px-12">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                    <div class="lg:col-span-6 space-y-5 reveal-on-scroll">
+                        <span class="font-script text-2xl text-rose-400 block">// O naszym studiu</span>
+                        <h2 class="text-2xl sm:text-4xl text-white font-bold tracking-tight">
+                            Przestrzeń, w której czujesz się swobodnie i bezpiecznie
+                        </h2>
+                        <p class="text-neutral-300 text-xs sm:text-sm leading-relaxed">
+                            Mommy Tattoo to kameralne studio w Nowym Sączu tworzone przez utalentowanych artystów z pasją do precyzji i niepowtarzalnego klimatu. Zapewniamy pełne wsparcie na każdym etapie – od pierwszej rozmowy i doboru kompozycji, przez higieniczne wykonanie, po pielęgnację.
+                        </p>
+                        <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                            Specjalizujemy się w subtelnym fineline, tatuażach kolorowych i autorskich motywach oraz bezpiecznym piercingu z doborem biżuterii tytanowej.
+                        </p>
+
+                        <div class="pt-2 grid grid-cols-2 gap-4 text-xs">
+                            <div class="p-3.5 rounded-xl bg-neutral-900/80 border border-white/10">
+                                <span class="font-bold text-white block mb-0.5">Artyści ze Studia:</span>
+                                <span class="text-neutral-400">Kalina & Łukasz (Wookash)</span>
+                            </div>
+                            <div class="p-3.5 rounded-xl bg-neutral-900/80 border border-white/10">
+                                <span class="font-bold text-white block mb-0.5">Higiena & Sprzęt:</span>
+                                <span class="text-neutral-400">100% sterylizacja i jednorazowe kartridże</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-6 luxury-card p-6 sm:p-8 rounded-3xl space-y-5 reveal-on-scroll reveal-delay-2">
+                        <h3 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-rose-500 text-sm"></i>
+                            <span>Wizytówka Studia</span>
+                        </h3>
+                        <div class="space-y-3 text-xs sm:text-sm text-neutral-300">
+                            <div class="flex items-start gap-3 pb-3 border-b border-white/5">
+                                <i class="fa-solid fa-location-dot text-rose-500 mt-1"></i>
+                                <div>
+                                    <span class="font-bold text-white block">Adres:</span>
+                                    <span>ul. 29 Listopada 8, 33-300 Nowy Sącz</span>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 pb-3 border-b border-white/5">
+                                <i class="fa-solid fa-envelope text-rose-500 mt-1"></i>
+                                <div>
+                                    <span class="font-bold text-white block">Adres E-mail:</span>
+                                    <a href="mailto:kalina0397@poczta.fm" class="hover:text-rose-400 transition">kalina0397@poczta.fm</a>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3 pb-3 border-b border-white/5">
+                                <i class="fa-brands fa-instagram text-rose-500 mt-1"></i>
+                                <div>
+                                    <span class="font-bold text-white block">Instagram:</span>
+                                    <a href="https://www.instagram.com/mommytattoo.studio/" target="_blank" class="hover:text-rose-400 transition">@mommytattoo.studio</a>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="fa-solid fa-door-open text-rose-500 mt-1"></i>
+                                <div>
+                                    <span class="font-bold text-white block">Godziny Pracy:</span>
+                                    <span>Poniedziałek – Piątek: 10:00 – 18:00</span><br>
+                                    <span>Sobota: 10:00 – 14:00 (Niedziela: ZAMKNIĘTE)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: DLACZEGO WARTO MIEĆ PROFESJONALNĄ STRONĘ? -->
+        <section id="benefits" class="py-16 sm:py-24 border-b border-white/10">
+            <div class="max-w-[1300px] mx-auto px-4 sm:px-8 lg:px-12">
+                <div class="text-center max-w-2xl mx-auto mb-12 reveal-on-scroll">
+                    <span class="font-script text-2xl text-rose-400 block">// Wygoda dla studia i klienta</span>
+                    <h2 class="text-2xl sm:text-4xl font-bold text-white mt-1 mb-3">Dlaczego Warto Mieć Własną Stronę?</h2>
+                    <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                        Koniec z chaosem w prywatnych wiadomościach i gubieniem zapytań. Zobacz, jak interaktywna strona usprawnia pracę studia.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+                    <div class="p-6 rounded-2xl luxury-card reveal-on-scroll reveal-delay-1">
+                        <div class="w-11 h-11 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-lg mb-4 border border-rose-500/30">
+                            <i class="fa-solid fa-inbox"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-base sm:text-lg mb-2">Zero Straconych Zgłoszeń</h3>
+                        <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                            Wiadomości na Instagramie często lądują w folderze „Inne” lub gubią się pośród komentarzy. Formularz zbiera kompletne zapytanie z wymiarami i zdjęciami w jednym panelu.
+                        </p>
+                    </div>
+
+                    <div class="p-6 rounded-2xl luxury-card reveal-on-scroll reveal-delay-2">
+                        <div class="w-11 h-11 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-lg mb-4 border border-rose-500/30">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-base sm:text-lg mb-2">Automatyczny Kalendarz 24/7</h3>
+                        <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                            Klient sam wybiera pasujący termin – nawet w środku nocy, gdy odpoczywasz po całym dniu pracy przy maszynce.
+                        </p>
+                    </div>
+
+                    <div class="p-6 rounded-2xl luxury-card reveal-on-scroll reveal-delay-3">
+                        <div class="w-11 h-11 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-lg mb-4 border border-rose-500/30">
+                            <i class="fa-solid fa-crown"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-base sm:text-lg mb-2">Wizerunek Klasy Premium</h3>
+                        <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                            Ciemny, elegancki design i wyeksponowane opinie 5.0 ★ budują natychmiastowe zaufanie nowych klientów poszukujących profesjonalnego studia w Nowym Sączu.
+                        </p>
+                    </div>
+
+                    <div class="p-6 rounded-2xl luxury-card reveal-on-scroll reveal-delay-4">
+                        <div class="w-11 h-11 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-lg mb-4 border border-rose-500/30">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-base sm:text-lg mb-2">100% Niezależności</h3>
+                        <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                            Brak prowizji dla zewnętrznych portali pośredniczących. Strona, baza klientów i historia rezerwacji należą w 100% wyłącznie do Mommy Tattoo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: PORTFOLIO / GALERIA -->
+        <section id="portfolio" class="py-16 sm:py-24 border-b border-white/10 bg-neutral-950/30">
+            <div class="max-w-[1300px] mx-auto px-4 sm:px-8 lg:px-12">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4 reveal-on-scroll">
+                    <div>
+                        <span class="font-script text-2xl text-rose-400 block">// Galeria autorska</span>
+                        <h2 class="text-2xl sm:text-4xl font-bold text-white mt-1">Portfolio Prac</h2>
+                    </div>
+                    <a href="https://www.instagram.com/mommytattoo.studio/" target="_blank" class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-rose-400 hover:text-white transition">
+                        <span>Zobacz więcej na @mommytattoo.studio</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+                    <!-- Zdjęcie 1: Kolorowy Feniks (Wookash) -->
+                    <div class="luxury-card rounded-2xl overflow-hidden cursor-pointer group shadow-sm reveal-on-scroll reveal-delay-1" onclick="openLightbox(0)">
+                        <div class="relative aspect-square overflow-hidden bg-neutral-900">
+                            <img src="portfolio-1.png" alt="Kolorowy Feniks" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute inset-0 bg-neutral-950/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">
+                                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <span class="text-[10px] uppercase tracking-wider text-rose-400 font-bold block mb-0.5">Kolor & Ilustracja</span>
+                            <h3 class="font-bold text-white text-sm truncate">Kolorowy Feniks</h3>
+                            <span class="text-[11px] text-neutral-400">Artysta: Wookash</span>
+                        </div>
+                    </div>
+
+                    <!-- Zdjęcie 2: Good Girl Chilli -->
+                    <div class="luxury-card rounded-2xl overflow-hidden cursor-pointer group shadow-sm reveal-on-scroll reveal-delay-2" onclick="openLightbox(1)">
+                        <div class="relative aspect-square overflow-hidden bg-neutral-900">
+                            <img src="portfolio-2.png" alt="Good Girl Chilli" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute inset-0 bg-neutral-950/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">
+                                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <span class="text-[10px] uppercase tracking-wider text-rose-400 font-bold block mb-0.5">Minimal & Kolor</span>
+                            <h3 class="font-bold text-white text-sm truncate">Good Girl Chilli</h3>
+                            <span class="text-[11px] text-neutral-400">Mommy Tattoo</span>
+                        </div>
+                    </div>
+
+                    <!-- Zdjęcie 3: Fineline Motyl (Kalina) -->
+                    <div class="luxury-card rounded-2xl overflow-hidden cursor-pointer group shadow-sm reveal-on-scroll reveal-delay-3" onclick="openLightbox(2)">
+                        <div class="relative aspect-square overflow-hidden bg-neutral-900">
+                            <img src="portfolio-3.png" alt="Fineline Motyl" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute inset-0 bg-neutral-950/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">
+                                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <span class="text-[10px] uppercase tracking-wider text-rose-400 font-bold block mb-0.5">Fineline & Linework</span>
+                            <h3 class="font-bold text-white text-sm truncate">Fineline Motyl</h3>
+                            <span class="text-[11px] text-neutral-400">Artystka: Kalina</span>
+                        </div>
+                    </div>
+
+                    <!-- Zdjęcie 4: Kwiat & Kaligrafia "Grzegorz" (Kalina) -->
+                    <div class="luxury-card rounded-2xl overflow-hidden cursor-pointer group shadow-sm reveal-on-scroll reveal-delay-4" onclick="openLightbox(3)">
+                        <div class="relative aspect-square overflow-hidden bg-neutral-900">
+                            <img src="portfolio-4.png" alt="Kwiat & Kaligrafia" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute inset-0 bg-neutral-950/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">
+                                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <span class="text-[10px] uppercase tracking-wider text-rose-400 font-bold block mb-0.5">Fineline & Napis</span>
+                            <h3 class="font-bold text-white text-sm truncate">Kwiat & Kaligrafia</h3>
+                            <span class="text-[11px] text-neutral-400">Artystka: Kalina</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: SYSTEM REZERWACJI ONLINE (4-KROKOWY WIZARD) -->
+        <section id="rezerwacja" class="py-16 sm:py-24 border-b border-white/10">
+            <div class="max-w-[1200px] mx-auto px-4 sm:px-8 lg:px-12">
+                <div class="text-center max-w-2xl mx-auto mb-10 reveal-on-scroll">
+                    <span class="font-script text-2xl text-rose-400 block">// Wygodny kalendarz</span>
+                    <h2 class="text-2xl sm:text-4xl font-bold text-white mt-1 mb-2">Zarezerwuj Swój Termin</h2>
+                    <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                        Wybierz usługę, znajdź dogodną datę i opisz swój pomysł w kilku prostych krokach.
+                    </p>
+                </div>
+
+                <!-- Kontener kreatora -->
+                <div class="luxury-card rounded-3xl p-6 sm:p-10 relative reveal-on-scroll reveal-delay-1">
+                    <!-- Zakładki kroków (równe odstępy, nie nachodzą na siebie) -->
+                    <div class="grid grid-cols-4 gap-2 sm:gap-4 border-b border-white/10 pb-3 mb-8 text-center text-xs sm:text-sm font-bold">
+                        <div id="step-tab-1" class="text-white border-b-2 border-rose-500 pb-2 font-bold cursor-pointer transition-colors truncate whitespace-nowrap" onclick="goToBookingStep(1)">
+                            <span class="hidden sm:inline">1. </span>Usługa / Styl
+                        </div>
+                        <div id="step-tab-2" class="text-neutral-500 pb-2 cursor-pointer font-normal transition-colors truncate whitespace-nowrap" onclick="goToBookingStep(2)">
+                            <span class="hidden sm:inline">2. </span>Data & Godzina
+                        </div>
+                        <div id="step-tab-3" class="text-neutral-500 pb-2 cursor-pointer font-normal transition-colors truncate whitespace-nowrap" onclick="goToBookingStep(3)">
+                            <span class="hidden sm:inline">3. </span>Dane & Pomysł
+                        </div>
+                        <div id="step-tab-4" class="text-neutral-500 pb-2 cursor-pointer font-normal transition-colors truncate whitespace-nowrap" onclick="goToBookingStep(4)">
+                            <span class="hidden sm:inline">4. </span>Podsumowanie
+                        </div>
+                    </div>
+
+                    <form id="main-booking-form">
+                        <!-- KROK 1: Wybór Usługi / Stylu (3 konkretne opcje bez lania wody) -->
+                        <div id="booking-step-1" class="step-slide-in space-y-6">
+                            <h3 class="text-lg sm:text-xl text-white font-bold mb-4">Wybierz interesującą Cię usługę:</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+                                <button type="button" id="service-option-fineline" onclick="selectService('fineline')" class="p-5 sm:p-6 rounded-3xl border border-rose-500 bg-rose-950/20 text-left transition hover:border-rose-400 cursor-pointer shadow-md">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-bold text-white text-base">Fineline & Linework</span>
+                                        <i class="fa-solid fa-feather text-rose-500 text-lg"></i>
+                                    </div>
+                                    <p class="text-xs text-neutral-400 leading-relaxed">
+                                        Delikatne, cienkie linie, motywy kwiatowe, motyle, estetyczne napisy i subtelne wzory.
+                                    </p>
+                                </button>
+
+                                <button type="button" id="service-option-kolor" onclick="selectService('kolor')" class="p-5 sm:p-6 rounded-3xl border border-white/10 bg-neutral-900/60 text-left transition hover:border-rose-500/50 cursor-pointer shadow-xs">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-bold text-white text-base">Kolor & Autorski</span>
+                                        <i class="fa-solid fa-palette text-neutral-400 text-lg"></i>
+                                    </div>
+                                    <p class="text-xs text-neutral-400 leading-relaxed">
+                                        Żywe kolory, wyraziste ilustracje (np. feniks, papryczka), cieniowania oraz indywidualne projekty.
+                                    </p>
+                                </button>
+
+                                <button type="button" id="service-option-piercing" onclick="selectService('piercing')" class="p-5 sm:p-6 rounded-3xl border border-white/10 bg-neutral-900/60 text-left transition hover:border-rose-500/50 cursor-pointer shadow-xs">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-bold text-white text-base">Profesjonalny Piercing</span>
+                                        <i class="fa-solid fa-gem text-neutral-400 text-lg"></i>
+                                    </div>
+                                    <p class="text-xs text-neutral-400 leading-relaxed">
+                                        Bezpieczne przekłucia uszu, nosa i ciała z zachowaniem najwyższych procedur sterylności i biżuterią.
+                                    </p>
+                                </button>
+                            </div>
+
+                            <div class="pt-6 text-right">
+                                <button type="button" onclick="goToBookingStep(2)" class="px-8 py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider transition shadow-md">
+                                    Dalej: Wybierz Termin →
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- KROK 2: Kalendarz i Godziny -->
+                        <div id="booking-step-2" class="step-slide-in space-y-6 hidden">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                                <!-- Kalendarz -->
+                                <div class="lg:col-span-7 bg-neutral-950/80 p-5 sm:p-6 rounded-2xl border border-white/10">
+                                    <div class="flex justify-between items-center mb-5">
+                                        <button type="button" id="cal-prev-btn" onclick="changeMonth(-1)" class="w-9 h-9 rounded-xl bg-neutral-900 border border-white/10 hover:bg-neutral-800 flex items-center justify-center text-xs transition">
+                                            <i class="fa-solid fa-chevron-left"></i>
+                                        </button>
+                                        <h3 id="current-month-year" class="text-base sm:text-lg text-white font-bold"></h3>
+                                        <button type="button" id="cal-next-btn" onclick="changeMonth(1)" class="w-9 h-9 rounded-xl bg-neutral-900 border border-white/10 hover:bg-neutral-800 flex items-center justify-center text-xs transition">
+                                            <i class="fa-solid fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Dni tygodnia -->
+                                    <div class="grid grid-cols-7 gap-2 text-center font-bold text-neutral-500 text-[11px] uppercase tracking-wider mb-2.5">
+                                        <div>Pn</div><div>Wt</div><div>Śr</div><div>Cz</div><div>Pt</div><div class="text-rose-400">Sb</div><div class="text-neutral-600">Nd</div>
+                                    </div>
+
+                                    <!-- Siatka dni -->
+                                    <div id="calendar-days-grid" class="grid grid-cols-7 gap-1.5 sm:gap-2"></div>
+
+                                    <!-- Legenda -->
+                                    <div class="mt-5 pt-3 border-t border-white/10 flex items-center justify-center gap-4 text-[11px] text-neutral-400 flex-wrap">
+                                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-neutral-800 border border-white/10"></span> Wolny dzień</span>
+                                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Ostatnie miejsca</span>
+                                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span> Brak wolnych miejsc</span>
+                                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-neutral-900 border border-white/5 opacity-50"></span> Niedziela (zamknięte)</span>
+                                    </div>
+                                </div>
+
+                                <!-- Wybór Godziny -->
+                                <div class="lg:col-span-5 space-y-4">
+                                    <div class="p-4 rounded-xl bg-neutral-950/80 border border-white/10">
+                                        <span class="text-[11px] uppercase tracking-wider text-neutral-500 font-bold block mb-1">Wybrana data:</span>
+                                        <span id="selected-day-display" class="text-base sm:text-lg text-white font-bold block">Wybierz dzień w kalendarzu</span>
+                                    </div>
+
+                                    <div>
+                                        <span class="text-xs uppercase tracking-wider text-neutral-400 font-bold block mb-2">Dostępne godziny:</span>
+                                        <div id="time-slots-container" class="grid grid-cols-2 gap-2.5">
+                                            <div class="col-span-2 text-center text-xs text-neutral-500 py-6">Wybierz najpierw dzień w kalendarzu.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3.5 rounded-xl bg-rose-950/20 border border-rose-800/30 text-xs text-neutral-300 leading-relaxed">
+                                        <i class="fa-solid fa-circle-info text-rose-400 mr-1.5"></i>
+                                        Pracujemy: <strong>Pn–Pt: 10:00–18:00</strong>, <strong>Soboty: 10:00–14:00</strong>. W niedziele studio odpoczywa!
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-6 flex justify-between items-center">
+                                <button type="button" onclick="goToBookingStep(1)" class="px-6 py-3 rounded-xl border border-white/20 text-neutral-300 hover:bg-neutral-800 font-bold text-xs uppercase tracking-wider transition">
+                                    ← Wróć do Stylów
+                                </button>
+                                <button type="button" onclick="goToBookingStep(3)" class="px-8 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider transition shadow-md">
+                                    Dalej: Twoje Dane →
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- KROK 3: Dane Klienta i Inspiracje -->
+                        <div id="booking-step-3" class="step-slide-in space-y-5 hidden">
+                            <h3 class="text-lg sm:text-xl text-white font-bold mb-4">Podaj dane do kontaktu i opisz swój pomysł:</h3>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs uppercase font-bold text-neutral-300 mb-1.5">Imię i Nazwisko *</label>
+                                    <input type="text" id="booking-client-name" placeholder="np. Patrycja Nowak" required class="w-full px-4 py-3 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs sm:text-sm outline-none focus:border-rose-500 transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs uppercase font-bold text-neutral-300 mb-1.5">Numer Telefonu *</label>
+                                    <div class="relative flex">
+                                        <button type="button" id="country-select-trigger" onclick="toggleCountryDropdown()" class="px-3.5 py-3 rounded-l-xl bg-neutral-950 border border-r-0 border-white/10 text-xs flex items-center gap-1.5 hover:bg-neutral-800 transition">
+                                            <span id="selected-country-flag" class="fi fi-pl"></span>
+                                            <span id="selected-country-code" class="font-semibold text-neutral-300">+48</span>
+                                            <i class="fa-solid fa-chevron-down text-[10px] text-neutral-500"></i>
+                                        </button>
+                                        <input type="tel" id="booking-client-phone" placeholder="600 000 000" required class="w-full px-4 py-3 rounded-r-xl bg-neutral-900 border border-white/10 text-white text-xs sm:text-sm outline-none focus:border-rose-500 transition">
+
+                                        <!-- Menu krajów -->
+                                        <div id="country-dropdown-menu" class="absolute top-full left-0 mt-2 w-64 max-h-56 bg-[#16161c] border border-white/15 rounded-xl shadow-2xl z-50 p-2.5 hidden">
+                                            <input type="text" id="country-search-input" oninput="renderCountryOptions(this.value)" placeholder="Szukaj kraju..." class="w-full px-3 py-1.5 text-xs rounded-lg bg-neutral-900 border border-white/10 mb-2 outline-none focus:border-rose-500 text-white">
+                                            <div id="country-options-list" class="space-y-1 overflow-y-auto max-h-40"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs uppercase font-bold text-neutral-300 mb-1.5">Adres E-mail *</label>
+                                    <input type="email" id="booking-client-email" placeholder="twoj@email.pl" required class="w-full px-4 py-3 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs sm:text-sm outline-none focus:border-rose-500 transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs uppercase font-bold text-neutral-300 mb-1.5">Planowane Miejsce na Ciele *</label>
+                                    <input type="text" id="booking-tattoo-placement" placeholder="np. przedramię, obojczyk, udo, kostka" required class="w-full px-4 py-3 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs sm:text-sm outline-none focus:border-rose-500 transition">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs uppercase font-bold text-neutral-300 mb-1.5">Opis Pomysłu / Przybliżony Wymiar (opcjonalnie)</label>
+                                <textarea id="booking-description" rows="3" placeholder="Opisz motyw, przybliżoną wielkość w cm lub czy to Twój pierwszy tatuaż..." class="w-full px-4 py-3 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs sm:text-sm outline-none focus:border-rose-500 transition"></textarea>
+                            </div>
+
+                            <!-- Upload inspiracji -->
+                            <div>
+                                <label class="block text-xs uppercase font-bold text-neutral-300 mb-1.5">Zdjęcia Inspiracji (maks. 3 pliki)</label>
+                                <div class="border border-dashed border-white/20 rounded-2xl p-6 text-center hover:border-rose-500 transition cursor-pointer bg-neutral-950/60" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="document.getElementById('inspiration-file-input').click()">
+                                    <i class="fa-solid fa-cloud-arrow-up text-2xl text-neutral-500 mb-2"></i>
+                                    <p class="text-xs text-neutral-300 font-medium">Kliknij lub przeciągnij zdjęcia referencyjne (JPG, PNG)</p>
+                                    <input type="file" id="inspiration-file-input" multiple accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                                </div>
+                                <div id="uploaded-files-preview" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3"></div>
+                            </div>
+
+                            <div class="pt-6 flex justify-between items-center">
+                                <button type="button" onclick="goToBookingStep(2)" class="px-6 py-3 rounded-xl border border-white/20 text-neutral-300 hover:bg-neutral-800 font-bold text-xs uppercase tracking-wider transition">
+                                    ← Wróć do Kalendarza
+                                </button>
+                                <button type="button" onclick="goToBookingStep(4)" class="px-8 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider transition shadow-md">
+                                    Dalej: Podsumowanie →
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- KROK 4: Podsumowanie i Potwierdzenie -->
+                        <div id="booking-step-4" class="step-slide-in space-y-6 hidden">
+                            <h3 class="text-lg sm:text-xl text-white font-bold mb-4">Podsumowanie Rezerwacji:</h3>
+
+                            <div class="p-5 sm:p-7 rounded-2xl bg-neutral-950/80 border border-white/10 space-y-3 text-xs sm:text-sm">
+                                <div class="flex justify-between border-b border-white/5 pb-2">
+                                    <span class="text-neutral-400">Wybrana usługa:</span>
+                                    <span id="summary-service-text" class="font-bold text-white text-right"></span>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-2">
+                                    <span class="text-neutral-400">Termin wizyty:</span>
+                                    <span id="summary-datetime-text" class="font-bold text-rose-400 text-right"></span>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-2">
+                                    <span class="text-neutral-400">Klient:</span>
+                                    <span id="summary-client-name" class="font-bold text-white text-right"></span>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-2">
+                                    <span class="text-neutral-400">Miejsce na ciele:</span>
+                                    <span id="summary-placement-text" class="font-bold text-white text-right"></span>
+                                </div>
+                                <div class="flex justify-between border-b border-white/5 pb-2">
+                                    <span class="text-neutral-400">Kontakt:</span>
+                                    <span id="summary-contact-text" class="font-mono text-neutral-300 text-right"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-neutral-400">Załączone inspiracje:</span>
+                                    <span id="summary-images-text" class="text-neutral-300 font-bold">0 szt.</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-3">
+                                <input type="checkbox" id="rodo-consent-checkbox" required class="mt-1 w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-white/20 bg-neutral-900">
+                                <label for="rodo-consent-checkbox" class="text-xs text-neutral-400 leading-relaxed cursor-pointer font-normal">
+                                    Wyrażam zgodę na przetwarzanie moich danych osobowych przez Mommy Tattoo w celu obsługi zapytania i organizacji terminu wizyty.
+                                </label>
+                            </div>
+
+                            <div class="pt-6 flex justify-between items-center">
+                                <button type="button" onclick="goToBookingStep(3)" class="px-6 py-3 rounded-xl border border-white/20 text-neutral-300 hover:bg-neutral-800 font-bold text-xs uppercase tracking-wider transition">
+                                    ← Popraw Dane
+                                </button>
+                                <button type="submit" class="px-8 py-3.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-rose-900/40">
+                                    <i class="fa-solid fa-check mr-1.5"></i> Zatwierdź Rezerwację
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: OPINIE Z GOOGLE (5.0 ★) -->
+        <section id="testimonials" class="py-16 sm:py-24 border-b border-white/10 bg-neutral-950/40">
+            <div class="max-w-[1300px] mx-auto px-4 sm:px-8 lg:px-12">
+                <div class="text-center max-w-2xl mx-auto mb-12 reveal-on-scroll">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-900 border border-white/10 text-xs font-bold text-white shadow-xs mb-3">
+                        <i class="fa-brands fa-google text-rose-500"></i>
+                        <span>Średnia ocena 5.0 ★ na podstawie 74 opinii</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-4xl font-bold text-white mt-1 mb-2">Opinie z Google</h2>
+                    <p class="text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                        Prawdziwe doświadczenia klientów, którzy zaufali artystom Mommy Tattoo.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Opinia 1: Patrycja Janik -->
+                    <div class="luxury-card p-6 sm:p-7 rounded-2xl flex flex-col justify-between reveal-on-scroll reveal-delay-1">
+                        <div>
+                            <div class="flex items-center gap-1 text-amber-400 text-sm mb-4">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-neutral-300 text-xs sm:text-sm leading-relaxed italic mb-6">
+                                „Świetne, klimatyczne miejsce. Robiłam tutaj pierwszy swój tatuaż, ale jestem zachwycona. Kalina zrobiła dla mnie projekt który przerósł moje oczekiwania. Ma niesamowitą wyobraźnię, osobowość i talent. Serdecznie polecam każdemu. Profesjonalizm w każdym calu od rozmowy po wykonanie. Dodatkowo w studio panuje naprawdę fajna atmosfera, można się pośmiać i nie wiadomo kiedy leci spędzony tam czas. Jeżeli się namyśle na kolejny projekt na pewno wykonam go właśnie tam ☺️”
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3 pt-4 border-t border-white/5">
+                            <div class="w-9 h-9 rounded-full bg-rose-950 text-rose-400 border border-rose-800 flex items-center justify-center font-bold text-xs">
+                                PJ
+                            </div>
+                            <div>
+                                <span class="font-bold text-white text-xs sm:text-sm block">Patrycja Janik</span>
+                                <span class="text-[11px] text-neutral-500">Lokalny przewodnik • 89 opinii</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opinia 2: Oskar Piwowar -->
+                    <div class="luxury-card p-6 sm:p-7 rounded-2xl flex flex-col justify-between border-rose-500/40 ring-1 ring-rose-500/30 reveal-on-scroll reveal-delay-2">
+                        <div>
+                            <div class="flex items-center gap-1 text-amber-400 text-sm mb-4">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-neutral-300 text-xs sm:text-sm leading-relaxed italic mb-6">
+                                „Super miejsce do zrobienia tatuażu, wszystko załatwione bez problemu od umawiania wizyty po tatuowanie. Łukasz (ig.Wookash) robił mi pierwszą dziare, mega pozytywny i profesjonalny gościu, na spokojnie wszystko wytłumaczy i pomoże, bez problemu słucha i pyta na różnych etapach czy wszystko w porządku, atmosfera w studiu również świetna. Z czystym sercem polecam to studio i napewno wrócę na kolejne dziarki.”
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3 pt-4 border-t border-white/5">
+                            <div class="w-9 h-9 rounded-full bg-neutral-800 text-white flex items-center justify-center font-bold text-xs">
+                                OP
+                            </div>
+                            <div>
+                                <span class="font-bold text-white text-xs sm:text-sm block">Oskar Piwowar</span>
+                                <span class="text-[11px] text-neutral-500">Klient studia • 1 opinia</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Opinia 3: Katarzyna Z. -->
+                    <div class="luxury-card p-6 sm:p-7 rounded-2xl flex flex-col justify-between reveal-on-scroll reveal-delay-3">
+                        <div>
+                            <div class="flex items-center gap-1 text-amber-400 text-sm mb-4">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                            </div>
+                            <p class="text-neutral-300 text-xs sm:text-sm leading-relaxed italic mb-6">
+                                „W studiu wykonałam swój pierwszy tatuaż. Pani Kalina mega profesjonalne podejście do klienta: szybkie umówienie wizyty z wszystkimi potrzebnymi informacjami; wykonanie projektu z własnymi sugestiami żeby wyglądał wyjątkowo; szybkie i profesjonalne wykonanie; poczucie bezpieczeństwa i dbałość o warunki sanitarne; no i ta atmosfera - człowiek czuje się jak u siebie w domu. Dziękuję za piękny tatuaż!”
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3 pt-4 border-t border-white/5">
+                            <div class="w-9 h-9 rounded-full bg-rose-950 text-rose-400 border border-rose-800 flex items-center justify-center font-bold text-xs">
+                                KZ
+                            </div>
+                            <div>
+                                <span class="font-bold text-white text-xs sm:text-sm block">Katarzyna Z.</span>
+                                <span class="text-[11px] text-neutral-500">Lokalny przewodnik • 49 opinii</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: FAQ (PŁYNNY AKORDEON) -->
+        <section class="py-16 sm:py-24 border-b border-white/10">
+            <div class="max-w-[850px] mx-auto px-4 sm:px-8">
+                <div class="text-center mb-10 reveal-on-scroll">
+                    <span class="font-script text-2xl text-rose-400 block">// Warto wiedzieć</span>
+                    <h2 class="text-2xl sm:text-4xl font-bold text-white mt-1">Często Zadawane Pytania</h2>
+                </div>
+
+                <div class="space-y-3.5">
+                    <details class="luxury-card rounded-2xl p-5 cursor-pointer reveal-on-scroll reveal-delay-1" open>
+                        <summary class="flex justify-between items-center text-sm sm:text-base text-white font-bold select-none">
+                            <span>Jak przygotować się do sesji tatuażu w Mommy Tattoo?</span>
+                            <i class="fa-solid fa-chevron-down text-rose-400 text-xs"></i>
+                        </summary>
+                        <div class="faq-content">
+                            <p class="text-xs sm:text-sm text-neutral-400 mt-3 leading-relaxed font-normal">
+                                Przed wizytą wyśpij się i zjedz sycący posiłek. Przez 24 godziny przed zabiegiem nie spożywaj alkoholu ani leków przeciwbólowych rozrzedzających krew. Zadbaj o nawilżenie skóry balsamem w miejscu planowanego tatuażu przez kilka dni przed sesją.
+                            </p>
+                        </div>
+                    </details>
+
+                    <details class="luxury-card rounded-2xl p-5 cursor-pointer reveal-on-scroll reveal-delay-2">
+                        <summary class="flex justify-between items-center text-sm sm:text-base text-white font-bold select-none">
+                            <span>W jakich godzinach studio przyjmuje klientów?</span>
+                            <i class="fa-solid fa-chevron-down text-rose-400 text-xs"></i>
+                        </summary>
+                        <div class="faq-content">
+                            <p class="text-xs sm:text-sm text-neutral-400 mt-3 leading-relaxed font-normal">
+                                Studio przy ul. 29 Listopada 8 w Nowym Sączu jest otwarte od poniedziałku do piątku w godzinach <strong>10:00 – 18:00</strong> oraz w soboty w godzinach <strong>10:00 – 14:00</strong>. W niedziele studio jest nieczynne, natomiast nasz kalendarz online na stronie działa przez 24/7!
+                            </p>
+                        </div>
+                    </details>
+
+                    <details class="luxury-card rounded-2xl p-5 cursor-pointer reveal-on-scroll reveal-delay-3">
+                        <summary class="flex justify-between items-center text-sm sm:text-base text-white font-bold select-none">
+                            <span>Czy wykonujecie również piercing i autorskie projekty?</span>
+                            <i class="fa-solid fa-chevron-down text-rose-400 text-xs"></i>
+                        </summary>
+                        <div class="faq-content">
+                            <p class="text-xs sm:text-sm text-neutral-400 mt-3 leading-relaxed font-normal">
+                                Tak! Oprócz tatuaży wykonujemy profesjonalny, w pełni bezpieczny piercing ciała oraz tworzymy unikalne, autorskie projekty dostosowane indywidualnie do anatomii Twojego ciała.
+                            </p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER / STOPKA -->
+        <footer id="contact" class="bg-black text-white border-t border-white/10 py-14 sm:py-20 relative z-20">
+            <div class="max-w-[1300px] mx-auto px-4 sm:px-8 lg:px-12">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <div class="space-y-4 reveal-on-scroll reveal-delay-1">
+                        <div class="flex items-center gap-3">
+                            <img src="logo.png" alt="Mommy Tattoo" class="w-11 h-11 object-contain bg-neutral-900 rounded-xl p-1 border border-white/10">
+                            <div>
+                                <span class="font-script text-2xl text-white block leading-none">Mommy Tattoo</span>
+                                <span class="text-[10px] uppercase tracking-[0.2em] text-rose-400 font-bold block mt-0.5">Nowy Sącz</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-neutral-400 leading-relaxed font-normal">
+                            Profesjonalne studio tatuażu i piercingu w Nowym Sączu. Fineline, kolor, sterylność i wygoda rezerwacji online.
+                        </p>
+                        <div class="space-y-2.5 text-xs text-neutral-300">
+                            <div class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-location-dot text-rose-500 w-4"></i>
+                                <span>ul. 29 Listopada 8, 33-300 Nowy Sącz</span>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-envelope text-rose-500 w-4"></i>
+                                <a href="mailto:kalina0397@poczta.fm" class="hover:text-rose-400 transition">kalina0397@poczta.fm</a>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <i class="fa-brands fa-instagram text-rose-500 w-4"></i>
+                                <a href="https://www.instagram.com/mommytattoo.studio/" target="_blank" class="hover:text-rose-400 transition font-semibold">@mommytattoo.studio</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 reveal-on-scroll reveal-delay-2">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-white">Godziny Pracy Studia</h3>
+                        <div class="space-y-2.5 text-xs text-neutral-300">
+                            <div class="flex justify-between border-b border-white/5 pb-2">
+                                <span>Poniedziałek – Piątek:</span>
+                                <span class="font-bold text-white">10:00 – 18:00</span>
+                            </div>
+                            <div class="flex justify-between border-b border-white/5 pb-2">
+                                <span>Sobota:</span>
+                                <span class="font-bold text-rose-400">10:00 – 14:00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Niedziela:</span>
+                                <span class="font-bold text-neutral-500">ZAMKNIĘTE</span>
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-neutral-900 border border-white/10 text-xs text-neutral-400">
+                            <i class="fa-solid fa-circle-check text-rose-500 mr-1.5"></i> Kalendarz rezerwacji online działa 24/7.
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 reveal-on-scroll reveal-delay-3">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-white">Chcesz Taką Stronę Dla Studia?</h3>
+                        <p class="text-xs text-neutral-400 leading-relaxed font-normal">
+                            To dedykowana wersja pokazowa przygotowana specjalnie dla Mommy Tattoo. Jeśli chcesz wdrożyć ten projekt i zautomatyzować zapisy – skontaktuj się ze mną.
+                        </p>
+                        <button type="button" onclick="openContactOwnerModal()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl text-center text-xs uppercase tracking-wider transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-envelope"></i> <span>Skontaktuj Się w Sprawie Strony</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-neutral-500 gap-3">
+                    <p>© 2026 Mommy Tattoo & Piercing Nowy Sącz. Wszelkie prawa zastrzeżone.</p>
+                    <div class="flex items-center gap-6">
+                        <a href="javascript:void(0)" onclick="openPrivacyModal()" class="hover:text-white transition">Polityka Prywatności</a>
+                        <a href="#admin" onclick="navigateToAdmin()" class="hover:text-rose-400 font-mono transition flex items-center gap-1.5 font-bold cursor-pointer">
+                            <i class="fa-solid fa-lock text-[11px]"></i> Panel Studia
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- PANEL ADMINISTRATORA / ZARZĄDZANIE REZERWACJAMI (#admin) -->
+    <div id="admin-view-container" class="relative z-10 pt-8 pb-20 max-w-[1300px] w-full mx-auto px-4 sm:px-8 hidden flex-grow">
+        <!-- Logowanie Admina -->
+        <div id="admin-login-box" class="max-w-md mx-auto luxury-card p-6 sm:p-10 rounded-3xl border border-white/15 shadow-2xl my-8 bg-[#121216]">
+            <div class="text-center mb-6">
+                <i class="fa-solid fa-user-shield text-4xl text-rose-500 mb-2"></i>
+                <h2 class="font-script text-3xl text-white">Panel Studia</h2>
+                <p class="text-xs text-neutral-400 mt-1">Zarządzanie terminami Mommy Tattoo</p>
+            </div>
+            <form id="admin-login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase font-bold text-neutral-400 mb-1.5">Login Demo</label>
+                    <input type="email" id="admin-email" value="admin@mommytattoo.pl" required class="w-full px-4 py-3 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs sm:text-sm outline-none focus:border-rose-500">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase font-bold text-neutral-400 mb-1.5">Hasło Demo</label>
+                    <input type="password" id="admin-password" value="admin123" required class="w-full px-4 py-3 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs sm:text-sm outline-none focus:border-rose-500">
+                </div>
+                <p id="admin-login-error" class="text-xs text-rose-500 font-medium hidden text-center"></p>
+                <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition shadow-md">
+                    Zaloguj do Panelu
+                </button>
+            </form>
+        </div>
+
+        <!-- Dashboard po zalogowaniu -->
+        <div id="admin-dashboard-content" class="hidden space-y-8 my-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 luxury-card p-5 sm:p-6 rounded-2xl border border-white/10">
+                <div class="flex items-center gap-3">
+                    <img src="logo.png" alt="Logo" class="w-10 h-10 object-contain bg-neutral-900 rounded-xl border border-white/10 p-1">
+                    <div>
+                        <h2 class="font-bold text-lg text-white">Rezerwacje Mommy Tattoo</h2>
+                        <p class="text-xs text-neutral-400">Zarządzaj terminami wizyt i inspiracjami klientów</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="window.location.hash = ''" class="px-4 py-2 rounded-xl border border-white/20 text-neutral-300 hover:bg-neutral-800 text-xs font-semibold transition">
+                        ← Strona Główna
+                    </button>
+                    <button onclick="logoutAdmin()" class="px-4 py-2 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300 hover:bg-rose-900 text-xs font-bold transition">
+                        Wyloguj
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABELA 1: OCZEKUJĄCE REZERWACJE -->
+            <div>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs uppercase font-bold tracking-wider text-neutral-300 flex items-center gap-2">
+                        <i class="fa-solid fa-clock text-rose-500"></i>
+                        Oczekujące Rezerwacje (<span id="admin-active-count" class="text-rose-400 font-mono font-bold">0</span>)
+                    </h3>
+                </div>
+
+                <div class="luxury-card rounded-2xl border border-white/10 overflow-hidden shadow-xs">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-neutral-950 text-neutral-400 font-mono text-[11px] uppercase tracking-wider border-b border-white/10">
+                                    <th class="py-3 px-4">Termin</th>
+                                    <th class="py-3 px-4">Klient</th>
+                                    <th class="py-3 px-4">Kontakt</th>
+                                    <th class="py-3 px-4">Usługa, Miejsce & Zdjęcia</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Decyzja</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-active-bookings-body" class="divide-y divide-white/5 text-xs sm:text-sm">
+                                <tr>
+                                    <td colspan="6" class="py-6 text-center text-xs text-neutral-500">Ładowanie rezerwacji...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABELA 2: HISTORIA REZERWACJI -->
+            <div class="pt-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs uppercase font-bold tracking-wider text-neutral-500 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-neutral-500"></i>
+                        Historia Rezerwacji (<span id="admin-history-count" class="text-neutral-500 font-mono font-bold">0</span>)
+                    </h3>
+                </div>
+
+                <div class="luxury-card rounded-2xl border border-white/10 overflow-hidden shadow-xs">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-neutral-950 text-neutral-500 font-mono text-[11px] uppercase tracking-wider border-b border-white/10">
+                                    <th class="py-3 px-4">Termin</th>
+                                    <th class="py-3 px-4">Klient</th>
+                                    <th class="py-3 px-4">Kontakt</th>
+                                    <th class="py-3 px-4">Usługa</th>
+                                    <th class="py-3 px-4">Status</th>
+                                    <th class="py-3 px-4 text-right">Akcja</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-history-bookings-body" class="divide-y divide-white/5 text-xs">
+                                <tr>
+                                    <td colspan="6" class="py-6 text-center text-xs text-neutral-600">Brak historii rezerwacji.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POWIĘKSZENIA ZDJĘĆ W PANELU ADMINA -->
+    <div id="admin-image-modal" class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 hidden">
+        <div class="relative max-w-2xl w-full bg-[#121216] border border-white/15 p-5 rounded-2xl shadow-2xl">
+            <button onclick="closeImageModal()" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-neutral-900 border border-white/10 text-white flex items-center justify-center text-xs">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="aspect-video w-full rounded-xl overflow-hidden bg-black mb-3">
+                <img id="admin-modal-img" src="" class="w-full h-full object-contain">
+            </div>
+            <div id="admin-modal-img-info" class="text-xs text-neutral-300"></div>
+        </div>
+    </div>
+
+    <!-- MODAL SUKCESU PO ZŁOŻENIU REZERWACJI -->
+    <div id="booking-success-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-[#121216] border border-white/15 p-6 sm:p-10 rounded-3xl max-w-md w-full text-center relative shadow-2xl">
+            <div class="w-14 h-14 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h3 class="text-xl sm:text-2xl font-bold text-white mb-2">Rezerwacja Złożona!</h3>
+            <p class="text-xs sm:text-sm text-neutral-400 mb-6">Dziękujemy! Otrzymaliśmy Twoje zgłoszenie do studia Mommy Tattoo.</p>
+
+            <div class="p-4 rounded-xl bg-neutral-900 border border-white/10 text-xs text-left space-y-2 mb-6">
+                <div class="flex justify-between">
+                    <span class="text-neutral-500">Kod rezerwacji:</span>
+                    <span id="success-booking-code" class="font-mono font-bold text-rose-400"></span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-neutral-500">Termin:</span>
+                    <span id="success-booking-datetime" class="font-bold text-white"></span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-neutral-500">Klient:</span>
+                    <span id="success-booking-client" class="text-neutral-200"></span>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <!-- W wersji demo widoczny przycisk do Panelu Studia -->
+                <a href="#admin" onclick="closeSuccessModal(); navigateToAdmin();" class="block w-full py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs uppercase tracking-wider transition border border-white/10">
+                    <i class="fa-solid fa-lock text-rose-400 mr-1.5"></i> Zobacz w Panelu Studia (Demo)
+                </a>
+                <button type="button" onclick="closeSuccessModal()" class="w-full py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider transition shadow-md">
+                    Zamknij
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX DLA GALERII -->
+    <div id="portfolio-lightbox" class="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between p-4 sm:p-6 hidden" onclick="handleLightboxBackdropClick(event)">
+        <div class="flex justify-between items-center z-10 w-full">
+            <span id="lightbox-counter" class="text-xs font-mono text-rose-400 bg-neutral-900 border border-white/10 px-3.5 py-1.5 rounded-full font-bold">1/4</span>
+            <button onclick="closeLightbox()" class="w-10 h-10 rounded-full bg-neutral-900 border border-white/10 hover:border-rose-500 text-neutral-300 hover:text-white flex items-center justify-center text-base transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="relative flex-1 flex items-center justify-center my-3 select-none" id="lightbox-image-container">
+            <button onclick="prevLightboxImage(event)" class="absolute left-2 sm:left-6 z-10 w-12 h-12 rounded-full bg-black/70 border border-white/10 hover:border-rose-500 text-white flex items-center justify-center transition text-base">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <img id="lightbox-img" src="" alt="" class="rounded-2xl border border-white/10 shadow-2xl max-h-[75vh] sm:max-h-[82vh] max-w-[92vw] object-contain">
+            <button onclick="nextLightboxImage(event)" class="absolute right-2 sm:right-6 z-10 w-12 h-12 rounded-full bg-black/70 border border-white/10 hover:border-rose-500 text-white flex items-center justify-center transition text-base">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="text-center z-10">
+            <h3 id="lightbox-title" class="text-lg sm:text-xl font-bold text-white"></h3>
+            <p id="lightbox-subtitle" class="text-xs text-rose-400 tracking-wider uppercase font-semibold mt-0.5">Mommy Tattoo</p>
+        </div>
+    </div>
+
+    <!-- BANER COOKIES -->
+    <div id="cookie-banner" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-sm z-40 translate-y-full opacity-0 transition-all duration-500">
+        <div class="luxury-card p-5 rounded-2xl border border-white/15 shadow-2xl space-y-2.5 bg-[#121216]">
+            <div class="flex items-center gap-2 text-white font-bold text-xs uppercase tracking-wider">
+                <i class="fa-solid fa-cookie-bite text-rose-500"></i> Polityka Cookies
+            </div>
+            <p class="text-xs text-neutral-400 leading-relaxed font-normal">
+                Używamy plików cookies w celu prawidłowego działania modułu rezerwacji terminów.
+            </p>
+            <div class="text-right pt-1">
+                <button onclick="acceptCookies()" class="bg-rose-600 hover:bg-rose-700 px-5 py-2 rounded-xl text-white font-bold text-xs uppercase tracking-wider transition">Rozumiem</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POLITYKI PRYWATNOŚCI -->
+    <div id="privacy-modal" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 hidden">
+        <div class="absolute inset-0" onclick="closePrivacyModal()"></div>
+        <div class="relative z-10 bg-[#121216] border border-white/15 p-6 sm:p-8 rounded-3xl max-w-lg w-full max-h-[85vh] overflow-y-auto shadow-2xl text-white">
+            <h3 class="text-xl font-bold text-white mb-4">Polityka Prywatności</h3>
+            <div class="text-xs sm:text-sm text-neutral-300 leading-relaxed space-y-3 font-normal">
+                <p><strong>1. Administrator Danych:</strong> Administratorem danych osobowych jest Mommy Tattoo z siedzibą przy ul. 29 Listopada 8, 33-300 Nowy Sącz.</p>
+                <p><strong>2. Cel przetwarzania:</strong> Dane podane w formularzu (imię, telefon, e-mail, preferencje) przetwarzane są wyłącznie w celu kontaktu oraz ustalenia terminu sesji tatuażu lub piercingu.</p>
+                <p><strong>3. Prawa użytkownika:</strong> Każda osoba ma prawo wglądu do swoich danych, ich poprawiania lub żądania ich usunięcia.</p>
+            </div>
+            <div class="mt-6 text-right">
+                <button onclick="closePrivacyModal()" class="bg-rose-600 text-white font-bold px-6 py-2.5 rounded-xl text-xs uppercase tracking-wider hover:bg-rose-700 transition">Zamknij</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Główny skrypt aplikacji -->
+    <script src="script.js"></script>
+</body>
+</html>

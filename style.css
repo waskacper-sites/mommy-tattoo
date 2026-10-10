@@ -1,0 +1,153 @@
+/* ==========================================================================
+   MOMMY TATTOO & PIERCING - NOWY SĄCZ
+   Styl: Ciemny, elegancki, minimalistyczny, luksusowy
+   Nagłówki: Styl pisany / kaligraficzny (Marck Script, Caveat, Alex Brush)
+   Kolory: Głęboka czerń, śnieżna biel, subtelne rubinowo-czerwone akcenty
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Marck+Script&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --bg-dark: #09090b;
+    --bg-card: rgba(18, 18, 22, 0.78);
+    --bg-card-hover: rgba(26, 26, 32, 0.92);
+    --border-dark: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(225, 29, 72, 0.45);
+    
+    --red-primary: #e11d48;
+    --red-light: #fb7185;
+    --red-glow: rgba(225, 29, 72, 0.28);
+    --red-subtle: rgba(225, 29, 72, 0.12);
+
+    --text-white: #fafafa;
+    --text-muted: #a1a1aa;
+    --text-dim: #71717a;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 15px;
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+}
+
+body {
+    background-color: var(--bg-dark);
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    color: var(--text-white);
+    overflow-x: hidden;
+}
+
+/* Czcionka pisana / kaligraficzna do nagłówków */
+.font-script {
+    font-family: 'Marck Script', cursive;
+}
+
+.font-calligraphy {
+    font-family: 'Alex Brush', cursive;
+}
+
+.font-hand {
+    font-family: 'Caveat', cursive;
+}
+
+/* Ambient Canvas w tle */
+#ambient-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.85;
+}
+
+/* Luksusowe karty z subtelną poświatą */
+.luxury-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-dark);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxury-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 10px 30px -10px var(--red-glow);
+}
+
+/* Animacje wejścia dla kroków */
+@keyframes slideFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.step-slide-in {
+    animation: slideFadeIn 0.35s ease-out forwards;
+}
+
+/* Reveal on scroll */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* Akordeon FAQ */
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+details[open] summary i {
+    transform: rotate(180deg);
+}
+
+details summary i {
+    transition: transform 0.3s ease;
+}
+
+.faq-content {
+    animation: slideFadeIn 0.3s ease;
+}
+
+/* Stylizowany scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #09090b;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #e11d48;
+}
+
+/* Subtelny czerwony glow tekstowy */
+.text-glow {
+    text-shadow: 0 0 20px rgba(225, 29, 72, 0.5);
+}
